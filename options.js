@@ -74,31 +74,32 @@ function fillMenu()
 
 
 // Saves options to localStorage.
-function save_options() 
+async function save_options() 
 {
     var select, value
     
     select = document.getElementById("color");
     value = select.children[select.selectedIndex].value;
-    localStorage["colorCode"]=colorCodes[value];
+    await chrome.storage.local.set({'colorCode': colorCodes[value]});
 
     select = document.getElementById("width");
-    localStorage["width"]=select.children[select.selectedIndex].value;
+    await chrome.storage.local.set({'width': select.children[select.selectedIndex].value});
+
 
     var rocker = document.getElementById('rocker')
     if(rocker.checked){
-        localStorage['rocker'] = true
+        await chrome.storage.local.set({'rocker': "true"});
     }
     else{
-        localStorage['rocker'] = false
+        await chrome.storage.local.set({'rocker': "false"});
     }
 
     var trail = document.getElementById('trail')
     if(trail.checked){
-        localStorage['trail'] = true
+        await chrome.storage.local.set({'trail': "true"});
     }
     else{
-        localStorage['trail'] = false
+        await chrome.storage.local.set({'trail': "false"});
     }
 
     // Update status to let user know options were saved.
@@ -115,9 +116,9 @@ function save_options()
     {
         s = inputs[i].parentElement.parentElement.children[0].textContent
         if(inputs[i].value.length > 0)
-            localStorage.setItem(commandTrans[s],inputs[i].value)
+            await chrome.storage.local.set({[commandTrans[s]]: inputs[i].value});
         else
-            localStorage.removeItem(commandTrans[s])
+            await chrome.storage.local.remove(commandTrans[s]);
     }
 
 }
