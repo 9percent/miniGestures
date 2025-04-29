@@ -234,8 +234,8 @@ function exeFunc()
                         else
                         {
                             console.log('problem executing open tab')
-                            if(chrome.runtime.lastError)
-                                console.log(chrome.runtime.lastError.message)
+                            /*if(chrome.runtime.lastError)
+                                console.log(chrome.runtime.lastError.message)*/
                         }
                     });
             }

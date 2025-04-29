@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.   
 */
 
-
+/*
 chrome.tabs.onRemoved.addListener(
     function (tabId, removeInfo) {
         chrome.tabs.get(tabId, function (tab) {
@@ -39,7 +39,7 @@ chrome.tabs.onUpdated.addListener(
 
     });
 
-
+*/
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     (async () => {
@@ -90,20 +90,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         if (request.msg == "trail") {
             const data = await chrome.storage.local.get('trail');
-            console.log("trail", data);
             sendResponse({ resp: data.trail });
         }
 
         if (request.msg == "lasttab") {
-            chrome.storage.local.get('lasturl', function (result) {
+            chrome.sessions.restore();
+            /*chrome.storage.local.get('lasturl', function (result) {
                 chrome.tabs.create({ 'url': result.lasturl }, function (tab) { })
-            });
+            });*/
             sendResponse({ resp: "tab opened" })
         }
 
 
         if (request.msg == "reloadall") {
-            chrome.tabs.getAllInWindow(null,
+            chrome.tabs.query({ currentWindow: true },
                 function (tabs) {
                     for (var i = 0; i < tabs.length; i++)
                         chrome.tabs.update(tabs[i].id, { url: tabs[i].url });
@@ -112,9 +112,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
 
         if (request.msg == "nexttab") {
-            chrome.tabs.getSelected(null,
+            chrome.tabs.getCurrent(
                 function (tab) {
-                    chrome.tabs.getAllInWindow(null,
+                    chrome.tabs.query({ currentWindow: true },
                         function (tabs) {
                             for (var i = 0; i < tabs.length; i++) {
                                 if (tabs[i].id == tab.id) {
@@ -131,9 +131,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
 
         if (request.msg == "prevtab") {
-            chrome.tabs.getSelected(null,
+            chrome.tabs.getCurrent(
                 function (tab) {
-                    chrome.tabs.getAllInWindow(null,
+                    chrome.tabs.query({ currentWindow: true },
                         function (tabs) {
                             for (var i = 0; i < tabs.length; i++) {
                                 if (tabs[i].id == tab.id) {
@@ -150,9 +150,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
 
         if (request.msg == "closeback") {
-            chrome.tabs.getSelected(null,
+            chrome.tabs.getCurrent(
                 function (tab) {
-                    chrome.tabs.getAllInWindow(null,
+                    chrome.tabs.query({ currentWindow: true },
                         function (tabs) {
                             for (var i = 0; i < tabs.length; i++) {
                                 if (tabs[i].id != tab.id)
@@ -164,7 +164,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
 
         if (request.msg == "closeall") {
-            chrome.tabs.getAllInWindow(null,
+            chrome.tabs.query({ currentWindow: true },
                 function (tabs) {
                     for (var i = 0; i < tabs.length; i++)
                         chrome.tabs.remove(tabs[i].id);
@@ -172,11 +172,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ resp: "tabs closed" })
         }
 
+        if (request.msg == "mutetab") {
+            chrome.tabs.getCurrent(async (tab) => {
+                let muted = !tab.mutedInfo.muted;
+                await chrome.tabs.update(tabId, { muted });
+                console.log(`Tab ${tab.id} is ${muted ? "muted" : "unmuted"}`);
+            });
+        }
+
         sendResponse({ resp: "probs" });
 
     })();
-        
-        return true;
-    }
+
+    return true;
+}
 );
 

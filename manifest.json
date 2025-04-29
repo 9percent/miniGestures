@@ -4,7 +4,8 @@
   "permissions": [
     "tabs",
     "storage",
-    "nativeMessaging"
+    "nativeMessaging",
+    "sessions"
   ],
   "background": {
     "service_worker": "service_worker.js"
